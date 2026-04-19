@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PAES M1 — Aula Virtual</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header" id="main-header">
+  <div class="header-left">
+    <button class="btn-back" onclick="window.location.href='index.html'" title="Volver al cronograma">← Cronograma</button>
+    <div class="logo-badge">PAES <span>M1</span></div>
+    <div class="header-info">
+      <h1 id="clase-titulo">Cargando…</h1>
+      <p class="header-subtitle" id="clase-subtitulo">Preparación PAES 2026</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="timer-block">
+      <span class="timer-label">⏱ Tiempo</span>
+      <span class="timer-display" id="timer-display">100:00</span>
+      <div class="timer-progress-bar"><div class="timer-progress-fill" id="timer-progress-fill"></div></div>
+    </div>
+    <button class="btn btn-meet" onclick="window.open('https://meet.google.com','_blank')">📹 Google Meet</button>
+    <button class="btn btn-pdf" onclick="exportPDF()">📄 Exportar PDF</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tab-nav" id="tab-nav">
+  <button class="tab-btn active" id="tab-repaso"  onclick="switchTab('repaso',this)"><span class="tab-icon">🔄</span> Repaso <span class="tab-time">20 min</span></button>
+  <button class="tab-btn" id="tab-teoria"          onclick="switchTab('teoria',this)"><span class="tab-icon">📚</span> Teoría <span class="tab-time">25 min</span></button>
+  <button class="tab-btn" id="tab-facil"            onclick="switchTab('facil',this)"><span class="tab-icon">⭐</span> Práctica Fácil <span class="tab-time">15 min</span></button>
+  <button class="tab-btn" id="tab-medio"            onclick="switchTab('medio',this)"><span class="tab-icon">⭐⭐</span> Práctica Media <span class="tab-time">15 min</span></button>
+  <button class="tab-btn" id="tab-dificil"          onclick="switchTab('dificil',this)"><span class="tab-icon">⭐⭐⭐</span> Desafío Final <span class="tab-time">25 min</span></button>
+  <button class="tab-btn" id="tab-pizarra"          onclick="switchTab('pizarra',this)"><span class="tab-icon">✏️</span> Pizarra</button>
+</nav>
+
+<main class="main-content">
+
+  <!-- REPASO -->
+  <section class="tab-section active" id="section-repaso">
+    <div class="section-header">
+      <h2>🔄 Repaso Previo — Conceptos Base</h2>
+      <p class="section-desc">Antes de comenzar, asegúrate de dominar estos conceptos clave</p>
+    </div>
+    <div class="repaso-grid" id="repaso-grid"></div>
+    <div class="repaso-checklist-summary">
+      <span id="repaso-progress-text">0 / 0 conceptos revisados</span>
+      <div class="progress-bar-container"><div class="progress-bar-fill" id="repaso-progress-bar" style="width:0%"></div></div>
+    </div>
+  </section>
+
+  <!-- TEORÍA -->
+  <section class="tab-section" id="section-teoria">
+    <div class="section-header">
+      <h2>📚 Teoría</h2>
+      <p class="section-desc" id="teoria-desc">Contenido completo alineado con la PAES 2025</p>
+    </div>
+    <div class="teoria-layout">
+      <aside class="teoria-index">
+        <h4>📋 Contenidos</h4>
+        <ul id="teoria-index-list"></ul>
+      </aside>
+      <div class="teoria-content" id="teoria-content"></div>
+    </div>
+  </section>
+
+  <!-- PRÁCTICA FÁCIL -->
+  <section class="tab-section" id="section-facil">
+    <div class="section-header">
+      <h2>⭐ Práctica Fácil</h2>
+      <p class="section-desc">Conceptos directos. Responde todos y luego corrige.</p>
+    </div>
+    <div class="practica-container" id="practica-facil-container"></div>
+    <div class="practica-actions">
+      <button class="btn btn-corregir" id="btn-corregir-facil" onclick="corregir('facil')">✅ Corregir Práctica Fácil</button>
+    </div>
+    <div class="resultado-panel" id="resultado-facil" style="display:none;"></div>
+  </section>
+
+  <!-- PRÁCTICA MEDIA -->
+  <section class="tab-section" id="section-medio">
+    <div class="section-header">
+      <h2>⭐⭐ Práctica Media</h2>
+      <p class="section-desc">Problemas con mayor contexto. Requieren interpretar el enunciado con cuidado.</p>
+    </div>
+    <div class="practica-container" id="practica-medio-container"></div>
+    <div class="practica-actions">
+      <button class="btn btn-corregir" id="btn-corregir-medio" onclick="corregir('medio')">✅ Corregir Práctica Media</button>
+    </div>
+    <div class="resultado-panel" id="resultado-medio" style="display:none;"></div>
+  </section>
+
+  <!-- DESAFÍO FINAL -->
+  <section class="tab-section" id="section-dificil">
+    <div class="section-header">
+      <h2>⭐⭐⭐ Desafío Final</h2>
+      <p class="section-desc">Problemas tipo PAES de alta complejidad. ¡Muestra todo lo que sabes!</p>
+    </div>
+    <div class="practica-container" id="practica-dificil-container"></div>
+    <div class="practica-actions">
+      <button class="btn btn-corregir" id="btn-corregir-dificil" onclick="corregir('dificil')">✅ Corregir Desafío Final</button>
+    </div>
+    <div class="resultado-panel" id="resultado-dificil" style="display:none;"></div>
+  </section>
+
+  <!-- PIZARRA -->
+  <section class="tab-section" id="section-pizarra">
+    <div class="section-header">
+      <h2>✏️ Pizarra Digital Interactiva</h2>
+      <p class="section-desc">Trabaja tus resoluciones aquí. Puedes dibujar, borrar y descargar.</p>
+    </div>
+    <div class="pizarra-toolbar">
+      <div class="tool-group">
+        <button class="tool-btn active-tool" id="tool-draw" onclick="setTool('draw',this)">✏️ Dibujar</button>
+        <button class="tool-btn" id="tool-line" onclick="setTool('line',this)">📏 Línea</button>
+        <button class="tool-btn" id="tool-eraser" onclick="setTool('eraser',this)">🗑 Borrar</button>
+      </div>
+      <div class="tool-group">
+        <label class="tool-label">Color:</label>
+        <input type="color" id="color-picker" value="#60efff" class="color-picker" onchange="changeColor(this.value)"/>
+      </div>
+      <div class="tool-group">
+        <label class="tool-label">Tamaño:</label>
+        <input type="range" id="brush-size" min="1" max="30" value="4" class="brush-slider" oninput="changeSize(this.value)"/>
+        <span id="brush-size-label">4px</span>
+      </div>
+      <div class="tool-group">
+        <button class="tool-btn tool-btn-danger" onclick="clearCanvas()">🧹 Limpiar</button>
+        <button class="tool-btn tool-btn-success" onclick="downloadCanvas()">💾 Descargar</button>
+      </div>
+    </div>
+    <canvas id="pizarra-canvas" class="pizarra-canvas"></canvas>
+  </section>
+
+</main>
+
+<!-- PROGRESS RING -->
+<div class="progress-ring-container" id="progress-ring-container" style="display:none;">
+  <svg class="progress-ring" width="80" height="80">
+    <circle class="progress-ring-bg" cx="40" cy="40" r="32"/>
+    <circle class="progress-ring-fill" id="ring-fill" cx="40" cy="40" r="32"/>
+  </svg>
+  <div class="ring-text" id="ring-text">0%</div>
+</div>
+
+<script src="clases-data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
+Pressing key...Stopping...
+
+Stop Agent
