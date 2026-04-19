@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>PAES M1 — Programa Completo 2026</title>
+  <meta name="description" content="Plataforma de preparación PAES M1 — Programa completo con 15 clases"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#0d0f17;--bg2:#12151f;--bg3:#181c29;
+      --cyan:#60efff;--blue:#4f8ef7;--purple:#a78bfa;
+      --green:#34d399;--orange:#fb923c;--red:#f87171;--gold:#fbbf24;
+      --txt:#eef2ff;--txt2:#8892b0;--txt3:#4a5568;
+      --border:#1e2d40;--r:12px;
+      --tr:all .25s cubic-bezier(.4,0,.2,1);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;
+      background-image:radial-gradient(ellipse at 15% 15%,rgba(96,239,255,.05) 0%,transparent 55%),
+                       radial-gradient(ellipse at 85% 85%,rgba(79,142,247,.05) 0%,transparent 55%);}
+    ::-webkit-scrollbar{width:6px;}
+    ::-webkit-scrollbar-track{background:var(--bg2);}
+    ::-webkit-scrollbar-thumb{background:#2a3550;border-radius:3px;}
+
+    /* ── HEADER ── */
+    .header{display:flex;align-items:center;justify-content:space-between;
+      padding:16px 32px;background:linear-gradient(135deg,#0d1b2a,var(--bg));
+      border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;
+      backdrop-filter:blur(14px);flex-wrap:wrap;gap:12px;}
+    .logo{display:flex;align-items:center;gap:14px;}
+    .logo-badge{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#0d0f17;
+      font-weight:800;font-size:1rem;padding:8px 14px;border-radius:8px;letter-spacing:1px;}
+    .logo h1{font-size:1.3rem;font-weight:700;
+      background:linear-gradient(135deg,#fff,var(--cyan));-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;background-clip:text;}
+    .logo p{font-size:.75rem;color:var(--txt2);margin-top:2px;}
+    .header-right{display:flex;align-items:center;gap:10px;}
+    .active-badge{background:rgba(96,239,255,.1);border:1px solid rgba(96,239,255,.3);
+      color:var(--cyan);padding:8px 14px;border-radius:8px;font-size:.8rem;font-weight:600;
+      max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .btn-go{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#0d0f17;
+      font-weight:700;padding:10px 20px;border:none;border-radius:8px;cursor:pointer;
+      font-family:'Inter',sans-serif;font-size:.9rem;transition:var(--tr);}
+    .btn-go:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(96,239,255,.35);}
+
+    /* ── MAIN ── */
+    .main{max-width:960px;margin:0 auto;padding:36px 24px;}
+
+    /* ── STATS BAR ── */
+    .stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:36px;}
+    .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+      padding:18px;text-align:center;transition:var(--tr);}
+    .stat-card:hover{border-color:rgba(96,239,255,.25);}
+    .stat-num{font-size:2rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--cyan);}
+    .stat-label{font-size:.75rem;color:var(--txt2);margin-top:4px;text-transform:uppercase;letter-spacing:.8px;}
+
+    /* ── LEGEND ── */
+    .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px;}
+    .legend-item{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--txt2);}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+    /* ── TIMELINE ── */
+    .section-title{font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:6px;}
+    .section-sub{font-size:.88rem;color:var(--txt2);margin-bottom:24px;}
+    .axis-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;
+      padding:6px 12px;border-radius:6px;display:inline-block;margin:20px 0 12px;
+      background:rgba(255,255,255,.04);}
+    .timeline{display:flex;flex-direction:column;gap:10px;}
+    .tl-item{display:flex;gap:16px;align-items:flex-start;}
+    .tl-dot{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;
+      justify-content:center;font-size:.72rem;font-weight:800;color:#0d0f17;
+      flex-shrink:0;margin-top:2px;letter-spacing:.5px;}
+    .tl-card{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
+      padding:16px 20px;transition:var(--tr);cursor:default;}
+    .tl-card:hover{border-color:rgba(96,239,255,.2);}
+    .tl-card.active-class{border-color:var(--cyan);box-shadow:0 0 24px rgba(96,239,255,.12);}
+    .tl-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+    .tl-title{font-size:.92rem;font-weight:600;color:var(--txt);}
+    .badge-active{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#0d0f17;
+      font-size:.65rem;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.5px;
+      white-space:nowrap;}
+    .badge-upcoming{background:rgba(255,255,255,.06);color:var(--txt3);
+      font-size:.65rem;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.5px;}
+    .badge-done{background:rgba(52,211,153,.12);color:var(--green);
+      font-size:.65rem;font-weight:600;padding:3px 10px;border-radius:20px;}
+    .tl-date{font-size:.78rem;color:var(--txt2);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .tl-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+    .tl-tag{background:rgba(255,255,255,.05);color:var(--txt3);font-size:.7rem;
+      padding:3px 9px;border-radius:5px;}
+    .tl-actions{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+    .btn-activate{padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:600;
+      cursor:pointer;transition:var(--tr);font-family:'Inter',sans-serif;border:none;}
+    .btn-activate.inactive{background:rgba(96,239,255,.08);color:var(--cyan);
+      border:1px solid rgba(96,239,255,.2);}
+    .btn-activate.inactive:hover{background:rgba(96,239,255,.18);transform:translateY(-1px);}
+    .btn-activate.is-active{background:linear-gradient(135deg,var(--cyan),var(--blue));
+      color:#0d0f17;cursor:default;}
+    .btn-enter{padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:700;
+      background:linear-gradient(135deg,var(--green),#059669);color:#fff;
+      border:none;cursor:pointer;transition:var(--tr);font-family:'Inter',sans-serif;}
+    .btn-enter:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(52,211,153,.3);}
+    .btn-date{padding:5px 10px;border-radius:6px;font-size:.75rem;font-weight:500;
+      background:rgba(255,255,255,.05);color:var(--txt2);border:1px solid var(--border);
+      cursor:pointer;transition:var(--tr);font-family:'Inter',sans-serif;}
+    .btn-date:hover{border-color:rgba(96,239,255,.3);color:var(--cyan);}
+    .date-editor{display:none;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+    .date-editor.open{display:flex;}
+    .date-input{background:var(--bg2);border:1px solid rgba(96,239,255,.3);color:var(--txt);
+      padding:6px 10px;border-radius:7px;font-family:'Inter',sans-serif;font-size:.8rem;}
+    .btn-save{padding:5px 12px;background:var(--cyan);color:#0d0f17;border:none;
+      border-radius:6px;font-weight:700;cursor:pointer;font-size:.8rem;font-family:'Inter',sans-serif;}
+    .btn-cancel{padding:5px 10px;background:transparent;color:var(--txt3);border:1px solid var(--border);
+      border-radius:6px;cursor:pointer;font-size:.8rem;font-family:'Inter',sans-serif;}
+    .btn-reset{padding:5px 8px;background:transparent;color:var(--orange);border:1px solid rgba(251,146,60,.3);
+      border-radius:6px;cursor:pointer;font-size:.75rem;font-family:'Inter',sans-serif;}
+
+    /* ── FOOTER ── */
+    .footer{text-align:center;padding:40px 24px;color:var(--txt3);font-size:.8rem;}
+
+    @media(max-width:600px){
+      .stats-bar{grid-template-columns:repeat(2,1fr);}
+      .header{padding:12px 16px;}
+      .main{padding:20px 14px;}
+    }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-badge">PAES <span style="font-size:.75em;opacity:.7">M1</span></div>
+    <div>
+      <h1>Programa Completo 2026</h1>
+      <p>Preparación PAES Matemática 1 — 15 Clases</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="active-badge" id="activeBadge">Cargando clase activa…</div>
+    <button class="btn-go" onclick="goToClass()">▶ Ir a la Clase</button>
+  </div>
+</header>
+
+<main class="main">
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="stat-num">15</div>
+      <div class="stat-label">Clases totales</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statDone">0</div>
+      <div class="stat-label">Realizadas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statActive">1</div>
+      <div class="stat-label">Clase activa</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statRemain">15</div>
+      <div class="stat-label">Por venir</div>
+    </div>
+  </div>
+
+  <h2 class="section-title">📅 Cronograma de Clases</h2>
+  <p class="section-sub">Activa la clase del día para que los alumnos puedan acceder. Puedes editar las fechas según tu calendario real.</p>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>Números</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Álgebra y Funciones</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#10b981"></span>Geometría</div>
+    <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Probabilidad y Estadística</div>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+</main>
+
+<footer class="footer">PAES M1 © 2026 — Plataforma de preparación docente</footer>
+
+<script>
+// ── DATOS DEL PROGRAMA ──
+const CLASES = [
+  {num:1,  eje:'Números',           color:'#3b82f6', title:'Operaciones con Números Racionales y Enteros', date:'2026-04-01',  tags:['Números enteros','Fracciones','Orden en la recta numérica'], hasContent:true},
+  {num:2,  eje:'Números',           color:'#3b82f6', title:'Porcentaje',                                   date:'2026-04-16', tags:['% de una cantidad','Variación porcentual','Problemas contextualizados'], hasContent:true},
+  {num:3,  eje:'Números',           color:'#3b82f6', title:'Potencias y Raíces Enésimas',                 date:'2026-04-23', tags:['Leyes de exponentes','Raíz n-ésima','Notación científica'], hasContent:true},
+  {num:4,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Expresiones Algebraicas',                  date:'2026-04-30', tags:['Factorización','Productos notables','Fracciones algebraicas'], hasContent:true},
+  {num:5,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Proporcionalidad',                         date:'2026-05-07', tags:['Razones y proporciones','Proporcionalidad directa e inversa','Regla de tres'], hasContent:true},
+  {num:6,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Ecuaciones e Inecuaciones de 1° Grado',    date:'2026-05-14', tags:['Ecuaciones lineales','Inecuaciones','Representación en recta numérica'], hasContent:true},
+  {num:7,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Sistemas de Ecuaciones Lineales 2×2',      date:'2026-05-21', tags:['Sustitución','Eliminación / Igualación','Interpretación gráfica'], hasContent:true},
+  {num:8,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Función Lineal y Afín',                    date:'2026-05-28', tags:['f(x) = mx + b','Pendiente e intercepto','Gráfica en plano cartesiano'], hasContent:true},
+  {num:9,  eje:'Álgebra y Funciones', color:'#8b5cf6', title:'Función Cuadrática',                       date:'2026-06-04', tags:['Parábola: vértice y eje','Ecuaciones cuadráticas','Discriminante'], hasContent:true},
+  {num:10, eje:'Geometría',          color:'#10b981', title:'Figuras Geométricas: Pitágoras, Áreas y Perímetros', date:'2026-06-11', tags:['Teorema de Pitágoras','Áreas y perímetros','Triángulos y cuadriláteros'], hasContent:true},
+  {num:11, eje:'Geometría',          color:'#10b981', title:'Cuerpos Geométricos: Volumen y Área',       date:'2026-06-18', tags:['Prismas y pirámides','Cilindro, cono, esfera','Área lateral y total'], hasContent:true},
+  {num:12, eje:'Geometría',          color:'#10b981', title:'Transformaciones Isométricas',              date:'2026-06-25', tags:['Traslación y reflexión','Rotación','Semejanza y homotecia'], hasContent:true},
+  {num:13, eje:'Probabilidad y Estadística', color:'#f59e0b', title:'Representación de Datos',          date:'2026-07-02', tags:['Tablas de frecuencia','Gráficos estadísticos','Interpretación de datos'], hasContent:true},
+  {num:14, eje:'Probabilidad y Estadística', color:'#f59e0b', title:'Medidas de Posición',              date:'2026-07-09', tags:['Cuartiles y percentiles','Diagrama de caja y bigotes','Media, mediana, moda'], hasContent:true},
+  {num:15, eje:'Probabilidad y Estadística', color:'#f59e0b', title:'Reglas de las Probabilidades',     date:'2026-07-16', tags:['Probabilidad clásica','Eventos complementarios y compuestos','Probabilidad condicional'], hasContent:true},
+];
+
+// ── PERSISTENCIA ──
+function loadState() {
+  return {
+    activeClass: parseInt(localStorage.getItem('paes_activeClass') || '1'),
+    customDates:  JSON.parse(localStorage.getItem('paes_customDates')  || '{}'),
+  };
+}
+function saveState(st) {
+  localStorage.setItem('paes_activeClass', st.activeClass);
+  localStorage.setItem('paes_customDates',  JSON.stringify(st.customDates));
+}
+let ST = loadState();
+
+// ── FORMATO FECHA ──
+const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const [y,m,d] = iso.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return `${DIAS[dt.getDay()]} ${d} ${MESES[m-1]} ${y}`;
+}
+
+// ── NAVEGACIÓN ──
+function goToClass() {
+  window.location.href = 'clase.html';
+}
+
+// ── ACTIVAR CLASE ──
+function setActive(num) {
+  ST.activeClass = num;
+  saveState(ST);
+  renderTimeline();
+}
+
+// ── FECHA EDITOR ──
+function openEditor(num) {
+  document.querySelectorAll('.date-editor').forEach(e => e.classList.remove('open'));
+  document.getElementById('editor-'+num).classList.add('open');
+}
+function closeEditor(num) {
+  document.getElementById('editor-'+num).classList.remove('open');
+}
+function saveDate(num) {
+  const val = document.getElementById('dp-'+num).value;
+  if (val) { ST.customDates[num] = val; saveState(ST); }
+  renderTimeline();
+}
+function resetDate(num) {
+  delete ST.customDates[num];
+  saveState(ST);
+  renderTimeline();
+}
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('statActive').textContent  = ST.activeClass;
+  document.getElementById('statDone').textContent    = ST.activeClass - 1;
+  document.getElementById('statRemain').textContent  = 16 - ST.activeClass;
+  const c = CLASES.find(x => x.num === ST.activeClass);
+  document.getElementById('activeBadge').textContent = c ? `📚 Clase ${c.num} · ${c.title}` : '—';
+}
+
+// ── RENDER TIMELINE ──
+function renderTimeline() {
+  const tl = document.getElementById('timeline');
+  let html = '', lastEje = '';
+
+  CLASES.forEach(c => {
+    if (c.eje !== lastEje) {
+      html += `<div class="axis-label" style="color:${c.color}">${c.eje.toUpperCase()}</div>`;
+      lastEje = c.eje;
+    }
+
+    const isActive = ST.activeClass === c.num;
+    const isPast   = c.num < ST.activeClass;
+    const date     = ST.customDates[c.num] || c.date;
+    const modified = !!(ST.customDates[c.num] && ST.customDates[c.num] !== c.date);
+
+    const badge = isActive
+      ? `<span class="badge-active">● EN CURSO</span>`
+      : isPast
+        ? `<span class="badge-done">✓ Realizada</span>`
+        : `<span class="badge-upcoming">Próxima</span>`;
+
+    const tags = c.tags.map(t => `<span class="tl-tag">${t}</span>`).join('');
+
+    html += `
+    <div class="tl-item" id="item-${c.num}">
+      <div class="tl-dot" style="background:${c.color}">C${c.num}</div>
+      <div class="tl-card ${isActive ? 'active-class' : ''}">
+        <div class="tl-header">
+          <div class="tl-title">Clase ${c.num} — ${c.title}</div>
+          ${badge}
+        </div>
+        <div class="tl-date">
+          <span>📅 ${fmtDate(date)}${modified ? ' <span style="color:var(--orange)" title="Fecha modificada">✎</span>' : ''}</span>
+          <button class="btn-date" onclick="openEditor(${c.num})">✏️ Editar fecha</button>
+          ${modified ? `<button class="btn-reset" onclick="resetDate(${c.num})">↺ Restaurar</button>` : ''}
+        </div>
+        <div class="date-editor" id="editor-${c.num}">
+          <input type="date" class="date-input" id="dp-${c.num}" value="${date}"/>
+          <button class="btn-save" onclick="saveDate(${c.num})">Guardar</button>
+          <button class="btn-cancel" onclick="closeEditor(${c.num})">Cancelar</button>
+        </div>
+        <div class="tl-tags">${tags}</div>
+        <div class="tl-actions">
+          <button class="btn-activate ${isActive ? 'is-active' : 'inactive'}"
+            onclick="${isActive ? '' : `setActive(${c.num})`}">
+            ${isActive ? '✓ Clase Activa' : '► Activar esta clase'}
+          </button>
+          ${isActive ? `<button class="btn-enter" onclick="goToClass()">🎓 Entrar a la clase</button>` : ''}
+        </div>
+      </div>
+    </div>`;
+  });
+
+  tl.innerHTML = html;
+  updateStats();
+
+  // Scroll a clase activa
+  const el = document.getElementById('item-' + ST.activeClass);
+  if (el) setTimeout(() => el.scrollIntoView({behavior:'smooth', block:'center'}), 200);
+}
+
+// ── INIT ──
+renderTimeline();
+</script>
+</body>
+</html>
+Pressing key...Getting DOM...Stopping...
+
+Stop Agent
