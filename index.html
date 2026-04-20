@@ -127,6 +127,7 @@
       .main{padding:20px 14px;}
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -179,6 +180,7 @@
 
 <footer class="footer">PAES M1 © 2026 — Plataforma de preparación docente</footer>
 
+<script src="supabase-client.js"></script>
 <script>
 // ── DATOS DEL PROGRAMA ──
 const CLASES = [
@@ -199,18 +201,39 @@ const CLASES = [
   {num:15, eje:'Probabilidad y Estadística', color:'#f59e0b', title:'Reglas de las Probabilidades',     date:'2026-07-16', tags:['Probabilidad clásica','Eventos complementarios y compuestos','Probabilidad condicional'], hasContent:true},
 ];
 
-// ── PERSISTENCIA ──
-function loadState() {
-  return {
-    activeClass: parseInt(localStorage.getItem('paes_activeClass') || '1'),
-    customDates:  JSON.parse(localStorage.getItem('paes_customDates')  || '{}'),
-  };
+// ── PERSISTENCIA Y SUPABASE ──
+let ST = {
+  activeClass: 1,
+  customDates: JSON.parse(localStorage.getItem('paes_customDates') || '{}')
+};
+
+async function loadStateFromSupabase() {
+  try {
+    const { data, error } = await supabase.from('estado_clase').select('active_class').eq('id', 1).single();
+    if (data && !error) {
+      ST.activeClass = data.active_class;
+    } else {
+      console.warn("Supabase load error", error);
+      // Fallback
+      ST.activeClass = parseInt(localStorage.getItem('paes_activeClass') || '1');
+    }
+    renderTimeline();
+  } catch(e) {
+    console.error(e);
+  }
 }
-function saveState(st) {
-  localStorage.setItem('paes_activeClass', st.activeClass);
-  localStorage.setItem('paes_customDates',  JSON.stringify(st.customDates));
+
+function saveStateDates() {
+  localStorage.setItem('paes_customDates', JSON.stringify(ST.customDates));
 }
-let ST = loadState();
+
+// Escuchar cambios en tiempo real desde Supabase para mantener sincronizados múltiples dispositivos
+supabase.channel('estado_clase_changes')
+  .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estado_clase' }, payload => {
+    ST.activeClass = payload.new.active_class;
+    renderTimeline();
+  })
+  .subscribe();
 
 // ── FORMATO FECHA ──
 const DIAS  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -227,11 +250,20 @@ function goToClass() {
   window.location.href = 'clase.html';
 }
 
-// ── ACTIVAR CLASE ──
-function setActive(num) {
+// ── ACTIVAR CLASE (SUPABASE) ──
+async function setActive(num) {
+  // Update local optimista
   ST.activeClass = num;
-  saveState(ST);
+  localStorage.setItem('paes_activeClass', num);
   renderTimeline();
+  
+  // Update backend
+  try {
+    const { error } = await supabase.from('estado_clase').update({ active_class: num, updated_at: new Date() }).eq('id', 1);
+    if (error) console.error("Error updating active class:", error);
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 // ── FECHA EDITOR ──
@@ -244,12 +276,12 @@ function closeEditor(num) {
 }
 function saveDate(num) {
   const val = document.getElementById('dp-'+num).value;
-  if (val) { ST.customDates[num] = val; saveState(ST); }
+  if (val) { ST.customDates[num] = val; saveStateDates(); }
   renderTimeline();
 }
 function resetDate(num) {
   delete ST.customDates[num];
-  saveState(ST);
+  saveStateDates();
   renderTimeline();
 }
 
@@ -326,6 +358,7 @@ function renderTimeline() {
 
 // ── INIT ──
 renderTimeline();
+loadStateFromSupabase();
 </script>
 </body>
 </html>

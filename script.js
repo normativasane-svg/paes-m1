@@ -4,9 +4,10 @@
 // ============================================================
 'use strict';
 
-// ── CLASE ACTIVA ──
-const claseNum = parseInt(localStorage.getItem('paes_activeClass') || '2');
-const CLASE = CLASES_DATA[claseNum] || CLASES_DATA[2];
+// ── CLASE ACTIVA Y ALUMNO ──
+let claseNum = 2; // Por defecto
+let CLASE = CLASES_DATA[claseNum];
+let isTeacher = false;
 
 // ── ESTADO ──
 const state = {
@@ -19,7 +20,40 @@ const state = {
 };
 
 // ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  // Comprobar si el alumno ingresó su nombre
+  if (!nombreAlumno) {
+    document.getElementById('name-overlay').style.display = 'flex';
+  }
+
+  await fetchActiveData();
+  setupRealtime();
+});
+
+function saveStudentName() {
+  const name = document.getElementById('student-name-input').value.trim();
+  if (name) {
+    nombreAlumno = name;
+    localStorage.setItem('paes_alumno_nombre', name);
+    document.getElementById('name-overlay').style.display = 'none';
+  } else {
+    alert("Por favor ingresa tu nombre");
+  }
+}
+
+async function fetchActiveData() {
+  try {
+    const { data, error } = await supabase.from('estado_clase').select('active_class').eq('id', 1).single();
+    if (data) {
+      claseNum = data.active_class;
+      CLASE = CLASES_DATA[claseNum] || CLASES_DATA[2];
+    }
+  } catch(e) {
+    console.warn("Usando fallback offline", e);
+    claseNum = parseInt(localStorage.getItem('paes_activeClass') || '2');
+    CLASE = CLASES_DATA[claseNum] || CLASES_DATA[2];
+  }
+  
   // Título
   document.getElementById('clase-titulo').textContent = `Clase ${claseNum} — ${CLASE.titulo}`;
   document.getElementById('clase-subtitulo').textContent = CLASE.subtitulo;
@@ -30,14 +64,24 @@ document.addEventListener('DOMContentLoaded', () => {
   renderEjercicios('facil', CLASE.facil);
   renderEjercicios('medio', CLASE.medio);
   renderEjercicios('dificil', CLASE.dificil);
-  initTimer();
+  if(!state.timerInterval) initTimer();
   initCheckboxes();
   addRingGradient();
 
   window.addEventListener('resize', () => {
     if (state.pizarraInitialized) resizePizarra();
   });
-});
+}
+
+function setupRealtime() {
+  supabase.channel('estado_clase_student')
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'estado_clase' }, payload => {
+      if (payload.new.active_class !== claseNum) {
+        document.getElementById('sync-banner').style.display = 'flex';
+      }
+    })
+    .subscribe();
+}
 
 // ── TABS ──
 function switchTab(tab, btn) {
@@ -174,6 +218,23 @@ function corregir(nivel) {
   lista.forEach(ej => document.querySelectorAll(`input[name="${ej.id}"]`).forEach(el => el.disabled=true));
   const btn = document.getElementById(`btn-corregir-${nivel}`);
   if (btn) { btn.disabled=true; btn.style.opacity='0.5'; }
+  
+  // Guardar en Supabase
+  if (nombreAlumno) {
+    const areasError = [...new Set(errores.map(e=>e.area))];
+    supabase.from('resultados_alumnos').insert([{
+      nombre_alumno: nombreAlumno,
+      clase_activa: claseNum,
+      nivel: nivel,
+      puntaje_porcentaje: pct,
+      correctas: correctas,
+      total: lista.length,
+      areas_a_mejorar: areasError
+    }]).then(({error}) => {
+      if (error) console.error("Error guardando progreso", error);
+      else console.log("Progreso guardado en la nube");
+    });
+  }
 }
 
 function mostrarResultado(nivel, correctas, total, pct, errores) {

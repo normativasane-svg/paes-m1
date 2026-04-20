@@ -8,9 +8,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="styles.css"/>
+  <style>
+    .name-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(13,15,23,0.9); z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; padding:24px; backdrop-filter:blur(8px); }
+    .name-card { background:var(--bg3); border:1px solid var(--border); border-radius:16px; padding:32px; width:100%; max-width:400px; text-align:center; box-shadow:0 12px 32px rgba(0,0,0,0.5); }
+    .name-card h2 { margin-bottom:12px; font-size:1.5rem; color:#fff; }
+    .name-card p { color:var(--txt2); font-size:0.9rem; margin-bottom:24px; }
+    .name-input { width:100%; padding:12px 16px; border-radius:8px; border:1px solid var(--border); background:var(--bg2); color:#fff; font-size:1rem; margin-bottom:16px; font-family:'Inter',sans-serif; }
+    .name-input:focus { outline:none; border-color:var(--cyan); }
+    .btn-start { background:linear-gradient(135deg,var(--cyan),var(--blue)); color:#0d0f17; font-weight:700; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; width:100%; font-size:1rem; }
+    .sync-banner { position:fixed; bottom:20px; right:20px; background:var(--bg3); border:1px solid var(--cyan); border-radius:8px; padding:12px 20px; z-index:9999; display:none; align-items:center; gap:12px; box-shadow:0 8px 24px rgba(0,0,0,0.4); animation:slideIn 0.3s ease; }
+    .sync-banner p { margin:0; font-size:0.9rem; color:#fff; font-weight:500; }
+    .btn-sync { background:var(--cyan); color:#000; border:none; border-radius:6px; padding:6px 12px; cursor:pointer; font-weight:700; font-size:0.8rem; }
+    @keyframes slideIn { from{transform:translateY(100px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+  </style>
 </head>
 <body>
+
+<!-- OVERLAYS -->
+<div class="name-overlay" id="name-overlay" style="display:none;">
+  <div class="name-card">
+    <h2>👋 ¡Hola!</h2>
+    <p>Ingresa tu nombre y apellido para guardar tu progreso.</p>
+    <input type="text" id="student-name-input" class="name-input" placeholder="Ej: Juan Pérez" onkeypress="if(event.key==='Enter') saveStudentName()"/>
+    <button class="btn-start" onclick="saveStudentName()">Entrar a Clases</button>
+  </div>
+</div>
+
+<div class="sync-banner" id="sync-banner">
+  <span style="font-size:1.5rem">🔄</span>
+  <div>
+    <p>El profesor ha cambiado la clase.</p>
+    <div style="margin-top:6px;"><button class="btn-sync" onclick="location.reload()">Sincronizar ahora</button></div>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header class="header" id="main-header">
@@ -152,6 +184,7 @@
   <div class="ring-text" id="ring-text">0%</div>
 </div>
 
+<script src="supabase-client.js"></script>
 <script src="clases-data.js"></script>
 <script src="script.js"></script>
 </body>
